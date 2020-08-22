@@ -134,19 +134,13 @@ namespace Test.Data
                   .HasDefaultValueSql("(newsequentialid())");
             });
 
-
-
             modelBuilder.Entity<Company>().HasData(
                 companies
             );
 
-
-
             modelBuilder.Entity<Invoice>().HasData(
                 invoices
             );
-
-
         }
     }
 }
