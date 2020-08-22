@@ -1,0 +1,111 @@
+﻿@using Test.Enums
+@model IEnumerable<Test.Models.Invoice>
+
+@{
+    ViewData["Title"] = "Index";
+    string sortBy = (string)ViewData["SortBy"];
+    bool asc = (bool)ViewData["Asc"];
+    string searchStr = (string)ViewData["SearchStr"];
+    int currentPage = (int)ViewData["CurrentPage"];
+    int totalPages = (int)ViewData["TotalPages"];
+}
+
+
+<h1>Invoice Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<form asp-action="Index" asp-route-sortby="@sortBy" asp-route-asc="@asc">
+    <input class="form-control-sm" id="search-str" name="searchstr" value="@searchStr" />
+    <input type="submit" class="btn btn-outline-secondary" value="Search" />
+</form>
+<table class="table table-sm table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Number)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortby="invdate" asp-route-asc="@(!asc)" asp-route-searchstr="@searchStr"> @Html.DisplayNameFor(model => model.InvDate)</a>
+                @if (sortBy == "invdate")
+                {
+                    if (asc)
+                    {
+                        <text>&darr;</text>
+                    }
+                    else
+                    {
+                        <text>&uarr;</text>
+                    }
+                }
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Number)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InvDate)
+                </td>
+                <td>
+                    @Enum.GetName(typeof(InvoiceType), item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Uid">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Uid">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Uid">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="row">
+    <a class="сol-2 btn btn-outline-secondary" asp-action="Index"
+       asp-route-sortby="@((string)ViewData["SortBy"])" asp-route-asc="@((bool)ViewData["Asc"])" asp-route-searchstr="@searchStr"
+       asp-route-gotopage="1">
+        First
+    </a>
+    <a class="сol-2 btn btn-outline-secondary" asp-action="Index"
+       asp-route-sortby="@((string)ViewData["SortBy"])" asp-route-asc="@((bool)ViewData["Asc"])" asp-route-searchstr="@searchStr"
+       asp-route-gotopage="@(currentPage == 1 ? 1 : currentPage-1)">
+        Previous
+    </a>
+    <form class="col-3" asp-action="Index" asp-route-sortby="@((string)ViewData["SortBy"])" asp-route-asc="@((bool)ViewData["Asc"])" asp-route-searchstr="@searchStr">
+        <label for="current-page">
+            <input type="number" id="current-page" class="form-control-sm" name="gotopage" value="@ViewData["CurrentPage"]" min="1" max="@ViewData["TotalPages"]" />
+            / @totalPages
+        </label>
+        <input type="submit" class="btn btn-outline-secondary" value="Go To">
+    </form>
+    <a class="сol-2 btn btn-outline-secondary" asp-action="Index"
+       asp-route-sortby="@((string)ViewData["SortBy"])" asp-route-asc="@((bool)ViewData["Asc"])" asp-route-searchstr="@searchStr"
+       asp-route-gotopage="@(currentPage == totalPages ? totalPages : currentPage+1)">
+        Next
+    </a>
+    <a class="сol-2 btn btn-outline-secondary" asp-action="Index"
+       asp-route-sortby="@((string)ViewData["SortBy"])" asp-route-asc="@((bool)ViewData["Asc"])" asp-route-searchstr="@searchStr"
+       asp-route-gotopage="@totalPages">
+        Last
+    </a>
+</div>
