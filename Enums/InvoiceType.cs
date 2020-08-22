@@ -1,5 +1,6 @@
 ﻿namespace Test.Enums
 {
+    //Enum for Invoice Types
     public enum InvoiceType
     {
         Credit = 1,

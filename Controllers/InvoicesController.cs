@@ -24,11 +24,13 @@ namespace Test.Controllers
         // GET: Invoices
         public async Task<IActionResult> Index(string sortby = "invdate", bool asc = false, string searchstr="", int gotopage = 1)
         {
+            //Take value for pagination
             int take = 15;
+            //search string for name or invoice number
             searchstr = !string.IsNullOrWhiteSpace(searchstr) ? searchstr.Trim().ToLower() : searchstr;
             gotopage = gotopage <= 0 ? 1 : gotopage;
             IQueryable<Invoice> query = _context.Invoice.Include(i => i.Company);
-
+            //checking parameter for sorting
             switch (sortby)
             {
                 default:
@@ -36,7 +38,7 @@ namespace Test.Controllers
                     break;
             }
 
-
+            //checking if search string is empty, if not search if company name or number contains the string
             if (!string.IsNullOrWhiteSpace(searchstr))
             {
                 query = query.Where(i =>
@@ -47,14 +49,19 @@ namespace Test.Controllers
                        
             try
             {
+                //calculating total record cound for the number of pages
                 int count = await query.CountAsync();
                 int totalPages = (int)Math.Ceiling((double)count / take);
+                //checking if there's 0 records: goto page 1 if 0 total pages
                 gotopage = gotopage > totalPages && totalPages > 0 ? totalPages : gotopage;
                 ViewData["SortBy"] = sortby;
                 ViewData["Asc"] = asc;
+                //setting 1 if total pages is 0 for front end display
                 ViewData["TotalPages"] = totalPages == 0 ? 1 : totalPages;
                 ViewData["CurrentPage"] = gotopage;
                 ViewData["SearchStr"] = searchstr;
+
+                //skipping and taking records from the DB depending on the current page
                 return View(await query.Skip(take * gotopage - take).Take(take).ToListAsync());
             }
               catch (SqlException)

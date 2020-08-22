@@ -25,10 +25,13 @@ namespace Test.Controllers
         // GET: Companies
         public async Task<IActionResult> Index(string sortby = "name", bool asc = true, string searchstr = null, int gotopage = 1)
         {
+            //Take value for pagination
             int take = 15;
+            //search string for name or address
             searchstr = !string.IsNullOrWhiteSpace(searchstr) ? searchstr.Trim().ToLower() : searchstr;
             gotopage = gotopage <= 0 ? 1 : gotopage;
             IQueryable<Company> query = from c in _context.Company select c;
+            //checking parameter for sorting
             switch (sortby)
             {
                 case "regdate":
@@ -39,6 +42,7 @@ namespace Test.Controllers
                     break;
             }
 
+            //checking if search string is empty, if not search if company name or address contains the string
             if (!string.IsNullOrWhiteSpace(searchstr))
             {
                 query = query.Where(c =>
@@ -46,18 +50,21 @@ namespace Test.Controllers
                     || c.Address.ToLower().Contains(searchstr)
                     );
             }
-
+                      
             try
             {
+                //calculating total record cound for the number of pages
                 int count = await query.CountAsync();
                 int totalPages = (int)Math.Ceiling((double)count / take);
+                //checking if there's 0 records: goto page 1 if 0 total pages
                 gotopage = gotopage > totalPages && totalPages>0 ? totalPages : gotopage;
                 ViewData["SortBy"] = sortby;
                 ViewData["Asc"] = asc;
+                //setting 1 if total pages is 0 for front end display
                 ViewData["TotalPages"] = totalPages == 0 ? 1 : totalPages;
                 ViewData["CurrentPage"] = gotopage;
                 ViewData["SearchStr"] = searchstr;
-
+                //skipping and taking records from the DB depending on the current page
                 return View(await query.Skip(take * gotopage - take).Take(take).ToListAsync());
             }
             catch (SqlException)

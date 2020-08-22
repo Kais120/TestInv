@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Test.Helpers
+    //Static class for Sequential Guid generation
 {    public static class SequentialGuid
     {
         public static Guid GenerateComb()
